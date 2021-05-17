@@ -1,9 +1,11 @@
 import React from "react";
 import "antd/dist/antd.css";
-import { List, Typography, Icon, Button, Checkbox, Spin } from "antd";
+import { List, Typography, Icon, Button, Checkbox, Spin, Modal } from "antd";
 import style from "./style.module.css";
 import QuizService from "../services/questions";
 import { withRouter } from "react-router-dom";
+const { confirm, success } = Modal;
+// Question list component
 
 function OneQuestion(props) {
   const onChange = (e) => {
@@ -23,11 +25,20 @@ function OneQuestion(props) {
         header={
           <div style={{ textAlign: "left", display: "flex" }}>
             <h1>
-              <span>{props.Num + 1}</span> {props.qtn.question}
+              <span style={{ color: "green" }}>{props.Num + 1}</span>
+              {" : "}
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: props.qtn.question,
+                }}
+              ></span>
             </h1>
             <Checkbox
-              style={{ marginLeft: "auto" }}
+              className={style.visitLater}
               onChange={onChange}
+              disabled={
+                typeof props.qtn.userSelection !== "undefined" ? true : false
+              }
               checked={
                 typeof props.qtn.isVisitLater !== "undefined"
                   ? props.qtn.isVisitLater
@@ -55,7 +66,9 @@ function OneQuestion(props) {
             }}
           >
             <h2>
-              <Typography.Text mark>{index + 1}</Typography.Text>{" "}
+              <Typography.Text className={style.Bullets}>
+                {index + 1}
+              </Typography.Text>{" "}
               <span>{item}</span>
             </h2>
           </List.Item>
@@ -64,6 +77,7 @@ function OneQuestion(props) {
     </div>
   );
 }
+// ----------------
 
 class QuizComp extends React.Component {
   constructor(props) {
@@ -73,6 +87,7 @@ class QuizComp extends React.Component {
       index: 0,
       minutes: 15,
       seconds: 0,
+      Score: 0,
     };
   }
 
@@ -107,6 +122,36 @@ class QuizComp extends React.Component {
       });
   };
 
+  showAlert = (type) => {
+    let that = this;
+    if (type === "confirm")
+      confirm({
+        title: "Are you sure you want to exit the Test?",
+        content: "If you exit the test it will flush all your answers.",
+        onOk() {
+          that.props.history.push("/choose-quiz");
+        },
+        onCancel() {
+          console.log("tst djbfkjd");
+        },
+        okText: "Exit Anyway",
+        cancelText: "Cancel",
+      });
+    else
+      success({
+        title: "Heres your test result",
+        content: (
+          <div>
+            You Scored {this.state.Score}/{this.state.QuestionData.length}
+          </div>
+        ),
+        onOk() {
+          that.props.history.push("/choose-quiz");
+        },
+        okText: "OK",
+      });
+  };
+
   getOptions = () => {
     var arr = JSON.parse(
       JSON.stringify(
@@ -121,6 +166,27 @@ class QuizComp extends React.Component {
     var dataArr = this.state.QuestionData;
     dataArr[i] = qtn;
     this.setState({ QuestionData: dataArr });
+  };
+  getTestScore = () => {
+    // var isAllAnswered = this.state.QuestionData.map((dataObj) => {
+    //   dataObj.filter(function (o) {
+    //     return o.hasOwnProperty("userSelection");
+    //   });
+    // });
+    var score = 0;
+    for (var i = 0; i < this.state.QuestionData.length; i++) {
+      if (typeof this.state.QuestionData[i].userSelection !== "undefined") {
+        if (
+          this.state.QuestionData[i].userSelection ===
+          this.state.QuestionData[i].correct_answer
+        ) {
+          score = score + 1;
+        }
+      }
+    }
+    this.setState({ Score: score });
+    this.props.history.push("/choose-quiz");
+    this.showAlert("Success");
   };
 
   componentDidMount() {
@@ -145,7 +211,14 @@ class QuizComp extends React.Component {
                   <span style={{ marginRignt: "10px" }}>
                     Test ends in {this.state.minutes} : {this.state.seconds}
                   </span>{" "}
-                  <Button size={"large"}>End Test</Button>
+                  <Button
+                    size={"large"}
+                    onClick={() => {
+                      this.showAlert("confirm");
+                    }}
+                  >
+                    End Test
+                  </Button>
                 </div>
               </div>
               <OneQuestion
@@ -183,7 +256,7 @@ class QuizComp extends React.Component {
                 if (this.state.index < this.state.QuestionData.length - 1) {
                   this.setState({ index: this.state.index + 1 });
                 } else {
-                  console.log("finish test");
+                  this.getTestScore();
                 }
               }}
             >
