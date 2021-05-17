@@ -1,19 +1,37 @@
 import React from "react";
 import "antd/dist/antd.css";
-import { List, Typography, Icon, Button } from "antd";
+import { List, Typography, Icon, Button, Checkbox } from "antd";
 import style from "./style.module.css";
 import QuizService from "../services/questions";
 import { withRouter } from "react-router-dom";
 
 function OneQuestion(props) {
+  const onChange = (e) => {
+    console.log(`checked = ${e.target.checked}`);
+    var data = props.qtn;
+    data.isVisitLater = e.target.checked;
+    props.update(data, props.Num);
+  };
+
   return (
     <div>
       <List
         header={
-          <div style={{ textAlign: "left" }}>
+          <div style={{ textAlign: "left", display: "flex" }}>
             <h1>
               <span>{props.Num + 1}</span> {props.qtn.question}
             </h1>
+            <Checkbox
+              style={{ marginLeft: "auto" }}
+              onChange={onChange}
+              checked={
+                typeof props.qtn.isVisitLater !== "undefined"
+                  ? props.qtn.isVisitLater
+                  : false
+              }
+            >
+              Visit Later
+            </Checkbox>
           </div>
         }
         bordered
@@ -60,7 +78,13 @@ class QuizComp extends React.Component {
       )
     );
     arr.push(this.state.QuestionData[this.state.index].correct_answer);
-    return arr;
+
+    return arr.sort();
+  };
+  updateQtnData = (qtn, i) => {
+    var dataArr = this.state.QuestionData;
+    dataArr[i] = qtn;
+    this.setState({ QuestionData: dataArr });
   };
 
   componentDidMount() {
@@ -68,6 +92,7 @@ class QuizComp extends React.Component {
   }
 
   render() {
+    console.log(this.state.QuestionData);
     return (
       <div style={{ padding: "30px" }}>
         {this.state.QuestionData.length > 0 ? (
@@ -85,6 +110,7 @@ class QuizComp extends React.Component {
               qtn={this.state.QuestionData[this.state.index]}
               Num={this.state.index}
               options={this.getOptions()}
+              update={this.updateQtnData}
             />
           </>
         ) : null}
@@ -106,15 +132,21 @@ class QuizComp extends React.Component {
               size={"large"}
               style={{ marginLeft: "auto" }}
               disabled={
-                this.state.index >= this.state.QuestionData.length - 1
+                this.state.index > this.state.QuestionData.length - 1
                   ? true
                   : false
               }
               onClick={() => {
-                this.setState({ index: this.state.index + 1 });
+                if (this.state.index < this.state.QuestionData.length - 1) {
+                  this.setState({ index: this.state.index + 1 });
+                } else {
+                  console.log("finish test");
+                }
               }}
             >
-              Next
+              {this.state.index === this.state.QuestionData.length - 1
+                ? "Finish Test"
+                : "Next"}
               <Icon type="right" />
             </Button>
           </div>
