@@ -69,7 +69,11 @@ function OneQuestion(props) {
               <Typography.Text className={style.Bullets}>
                 {index + 1}
               </Typography.Text>{" "}
-              <span>{item}</span>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: item,
+                }}
+              ></span>
             </h2>
           </List.Item>
         )}
@@ -85,9 +89,9 @@ class QuizComp extends React.Component {
     this.state = {
       QuestionData: [],
       index: 0,
-      minutes: 15,
+      minutes: 10,
       seconds: 0,
-      Score: 0,
+      ScoreData: 0,
     };
   }
 
@@ -142,7 +146,7 @@ class QuizComp extends React.Component {
         title: "Heres your test result",
         content: (
           <div>
-            You Scored {this.state.Score}/{this.state.QuestionData.length}
+            You Scored {that.state.ScoreData} / {that.state.QuestionData.length}
           </div>
         ),
         onOk() {
@@ -177,16 +181,15 @@ class QuizComp extends React.Component {
     for (var i = 0; i < this.state.QuestionData.length; i++) {
       if (typeof this.state.QuestionData[i].userSelection !== "undefined") {
         if (
-          this.state.QuestionData[i].userSelection ===
+          this.state.QuestionData[i].userSelection.value ===
           this.state.QuestionData[i].correct_answer
         ) {
           score = score + 1;
         }
       }
     }
-    this.setState({ Score: score });
-    this.props.history.push("/choose-quiz");
-    this.showAlert("Success");
+    this.setState({ ScoreData: score });
+    setTimeout(() => this.showAlert("Success"), 500);
   };
 
   componentDidMount() {
