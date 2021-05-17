@@ -1,9 +1,9 @@
 import React from "react";
 import "antd/dist/antd.css";
-import { PageHeader } from "antd";
+import { PageHeader, Button } from "antd";
 import quiz_logo from "../quiz_logo.png";
 
-class QuizContainer extends React.Component {
+class MainContainer extends React.Component {
   render() {
     return (
       <div>
@@ -21,10 +21,15 @@ class QuizContainer extends React.Component {
               <span>Quizify</span>
             </div>
           }
+          extra={[
+            <Button type="primary" size={"large"}>
+              Logout
+            </Button>,
+          ]}
         />
       </div>
     );
   }
 }
 
-export default QuizContainer;
+export default MainContainer;

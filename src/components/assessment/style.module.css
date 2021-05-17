@@ -9,3 +9,14 @@
   display: flex;
   margin-bottom: 10px;
 }
+
+.highlightList {
+  background: #d5eaf5;
+  border: 1px solid #b2d7eb;
+}
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  padding: 100px;
+}

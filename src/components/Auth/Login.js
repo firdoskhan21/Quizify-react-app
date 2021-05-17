@@ -43,7 +43,7 @@ class LoginForm extends React.Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <div className={style.mainContainer}>
-        <h2>Welcome to Quizify</h2>
+        <h1>Welcome to Quizify</h1>
         <div className={style.Login_container}>
           <div>
             <img

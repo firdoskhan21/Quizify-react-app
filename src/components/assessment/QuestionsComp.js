@@ -1,15 +1,19 @@
 import React from "react";
 import "antd/dist/antd.css";
-import { List, Typography, Icon, Button, Checkbox } from "antd";
+import { List, Typography, Icon, Button, Checkbox, Spin } from "antd";
 import style from "./style.module.css";
 import QuizService from "../services/questions";
 import { withRouter } from "react-router-dom";
 
 function OneQuestion(props) {
   const onChange = (e) => {
-    console.log(`checked = ${e.target.checked}`);
     var data = props.qtn;
     data.isVisitLater = e.target.checked;
+    props.update(data, props.Num);
+  };
+  const upDataData = (selection, i) => {
+    var data = props.qtn;
+    data.userSelection = { value: selection, position: i };
     props.update(data, props.Num);
   };
 
@@ -37,7 +41,19 @@ function OneQuestion(props) {
         bordered
         dataSource={props.options}
         renderItem={(item, index) => (
-          <List.Item style={{ textAlign: "left" }}>
+          <List.Item
+            style={{ textAlign: "left", cursor: "pointer" }}
+            className={
+              typeof props.qtn.userSelection !== "undefined"
+                ? props.qtn.userSelection.position === index
+                  ? style.highlightList
+                  : ""
+                : ""
+            }
+            onClick={() => {
+              upDataData(item, index);
+            }}
+          >
             <h2>
               <Typography.Text mark>{index + 1}</Typography.Text>{" "}
               <span>{item}</span>
@@ -55,15 +71,35 @@ class QuizComp extends React.Component {
     this.state = {
       QuestionData: [],
       index: 0,
+      minutes: 15,
+      seconds: 0,
     };
   }
+
+  updateTimer = (duration) => {
+    var timer = duration,
+      min,
+      sec;
+    let that = this;
+    setInterval(function () {
+      min = parseInt(timer / 60, 10);
+      sec = parseInt(timer % 60, 10);
+      min = min < 10 ? "0" + min : min;
+      sec = sec < 10 ? "0" + sec : sec;
+      that.setState({ minutes: min, seconds: sec });
+      if (--timer < 0) {
+        timer = duration;
+      }
+    }, 1000);
+  };
 
   getQuestionsData = async () => {
     QuizService.getQuestionsData(this.props.match.params.type)
       .then((response) => {
         if (response.data.results) {
-          console.log(response.data.results);
           this.setState({ QuestionData: response.data.results });
+          var minutes = 60 * this.state.minutes;
+          this.updateTimer(minutes);
         }
       })
       .catch((err) => {
@@ -92,28 +128,35 @@ class QuizComp extends React.Component {
   }
 
   render() {
-    console.log(this.state.QuestionData);
     return (
       <div style={{ padding: "30px" }}>
-        {this.state.QuestionData.length > 0 ? (
-          <>
-            <div className={style.QtnHeader}>
-              <span>
-                {this.state.QuestionData[this.state.index].category} Test
-              </span>
-              <div style={{ marginLeft: "auto" }}>
-                <span>Timer</span>
-                <Button size={"large"}>End Test</Button>
+        <Spin
+          className={style.loaderContainer}
+          spinning={this.state.QuestionData.length === 0 ? true : false}
+          delay={500}
+        >
+          {this.state.QuestionData.length > 0 ? (
+            <>
+              <div className={style.QtnHeader}>
+                <span>
+                  {this.state.QuestionData[this.state.index].category} Test
+                </span>
+                <div style={{ marginLeft: "auto" }}>
+                  <span style={{ marginRignt: "10px" }}>
+                    Test ends in {this.state.minutes} : {this.state.seconds}
+                  </span>{" "}
+                  <Button size={"large"}>End Test</Button>
+                </div>
               </div>
-            </div>
-            <OneQuestion
-              qtn={this.state.QuestionData[this.state.index]}
-              Num={this.state.index}
-              options={this.getOptions()}
-              update={this.updateQtnData}
-            />
-          </>
-        ) : null}
+              <OneQuestion
+                qtn={this.state.QuestionData[this.state.index]}
+                Num={this.state.index}
+                options={this.getOptions()}
+                update={this.updateQtnData}
+              />
+            </>
+          ) : null}
+        </Spin>
         <div className={style.containerFooter}>
           <div style={{ display: "flex" }}>
             <Button

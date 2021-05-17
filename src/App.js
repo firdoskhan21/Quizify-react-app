@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import AuthLogin from "../src/components/Auth/Login";
 import QuizComp from "../src/components/assessment/QuestionsComp";
 import QuizContainer from "../src/components/assessment/QuizContainer";
-import ScoreComp from "../src/components/assessment/scoreComp";
 import MainContainer from "../src/components/MainContainer.js";
 import "./App.css";
 import { createBrowserHistory } from "history";
@@ -38,10 +37,6 @@ function App() {
             <Route path="/quiz/:type">
               <MainContainer />
               <QuizComp />
-            </Route>
-            <Route path="/score">
-              <MainContainer />
-              <ScoreComp />
             </Route>
           </Switch>
         </BrowserRouter>
