@@ -1,0 +1,17 @@
+.Login_container {
+  display: grid;
+  box-sizing: border-box;
+  width: 400px;
+  height: 400px;
+  padding: 20px;
+  border: 1px solid #dae8f1;
+  box-shadow: 6px 4px 4px 2px #eee;
+  border-radius: 2px;
+  background: #dae8f1;
+}
+
+.mainContainer {
+  display: grid;
+  justify-content: center;
+  transform: translate(0, 30%);
+}
