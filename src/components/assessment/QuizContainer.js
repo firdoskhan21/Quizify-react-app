@@ -4,7 +4,7 @@ import { List, Button } from "antd";
 import { Link } from "react-router-dom";
 import style from "./style.module.css";
 import userPayload from "../services/Auth";
-const list = ["Art", "Sports", "History", "Geography", "Politics"];
+const list = JSON.parse(localStorage.getItem("qtn_details"));
 class QuizContainer extends React.Component {
   constructor(props) {
     super(props);
@@ -25,12 +25,20 @@ class QuizContainer extends React.Component {
           className="demo-loadmore-list"
           itemLayout="horizontal"
           dataSource={list}
-          renderItem={(item) => (
+          renderItem={(item, index) => (
             <List.Item
               actions={[
-                <Link to={`/quiz/${item}`} query={{ type: item }}>
-                  <Button size={"large"} type="primary">
-                    Start Test
+                <span className={style.duration_block}>Duration : 10 min</span>,
+                <Link
+                  to={`/quiz/${item.type}/${index}`}
+                  query={{ type: item.type }}
+                >
+                  <Button
+                    size={"large"}
+                    type="primary"
+                    className={item.istestTaken && style.optedTest}
+                  >
+                    {item.istestTaken ? "Test Taken" : "Start Test"}
                   </Button>
                 </Link>,
               ]}
@@ -38,12 +46,15 @@ class QuizContainer extends React.Component {
               <List.Item.Meta
                 style={{ textAlign: "left" }}
                 title={
-                  <Link to={`/quiz/'${item}`} query={{ type: item }}>
-                    <h3>{item.toUpperCase()}</h3>
+                  <Link
+                    to={`/quiz/'${item.type}/${index}`}
+                    query={{ type: item.type }}
+                  >
+                    <h3>{item.type.toUpperCase()}</h3>
                   </Link>
                 }
                 description={
-                  "The Questions in this test will be of the field " + item
+                  "The Questions in this test will be of the field " + item.type
                 }
               />
             </List.Item>

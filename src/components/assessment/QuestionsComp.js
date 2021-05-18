@@ -1,6 +1,15 @@
 import React from "react";
 import "antd/dist/antd.css";
-import { List, Typography, Icon, Button, Checkbox, Spin, Modal } from "antd";
+import {
+  List,
+  Typography,
+  Icon,
+  Button,
+  Checkbox,
+  Spin,
+  Modal,
+  notification,
+} from "antd";
 import style from "./style.module.css";
 import QuizService from "../services/questions";
 import { withRouter } from "react-router-dom";
@@ -122,30 +131,34 @@ class QuizComp extends React.Component {
         }
       })
       .catch((err) => {
-        //something went wrong
+        notification["error"]({
+          message: "Something wet wrong",
+          placement: "bottomRight",
+        });
       });
   };
 
   showAlert = (type) => {
     let that = this;
-    if (type === "confirm")
+    console.log(this.props);
+    if (type === "confirm") {
       confirm({
-        title: "Are you sure you want to exit the Test?",
-        content: "If you exit the test it will flush all your answers.",
+        title: <h2>Are you sure you want to exit the Test?</h2>,
+        content: <h3>If you exit the test it will flush all your answers.</h3>,
         onOk() {
           that.props.history.push("/choose-quiz");
-        },
-        onCancel() {
-          console.log("tst djbfkjd");
         },
         okText: "Exit Anyway",
         cancelText: "Cancel",
       });
-    else
+    } else {
+      var userList = JSON.parse(localStorage.getItem("qtn_details"));
+      userList[that.props.match.params.value].istestTaken = true;
+      localStorage.setItem("qtn_details", JSON.stringify(userList));
       success({
-        title: "Heres your test result",
+        title: <h2>Heres your test result</h2>,
         content: (
-          <div>
+          <div style={{ fontSize: "1.1rem" }}>
             You Scored {that.state.ScoreData} / {that.state.QuestionData.length}
           </div>
         ),
@@ -154,6 +167,7 @@ class QuizComp extends React.Component {
         },
         okText: "OK",
       });
+    }
   };
 
   getOptions = () => {

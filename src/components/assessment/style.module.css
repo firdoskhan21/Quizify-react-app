@@ -35,3 +35,15 @@
   background-color: #ffe58f;
   margin-right: 10px;
 }
+
+.duration_block {
+  padding: 5px;
+  border: 1px solid #b7bcb7;
+  color: #22272b;
+  border-radius: 3px;
+}
+
+.optedTest {
+  background: #4aad4a !important;
+  border-color: #4aad4a !important;
+}

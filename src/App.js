@@ -34,7 +34,7 @@ function App() {
               <MainContainer />
               <QuizContainer />
             </Route>
-            <Route path="/quiz/:type">
+            <Route path="/quiz/:type/:value">
               <MainContainer />
               <QuizComp />
             </Route>
